@@ -2,12 +2,12 @@ import abc
 from typing import List, Optional, Union, Type
 from uuid import UUID
 
-from src.schemas.pydantic.auth_schema import UserBase
+from src.schemas.pydantic.auth_schema import UserCreate, UserDTO
 
 
 class AbstractRepository(abc.ABC):
     @abc.abstractmethod
-    def add(self, user: UserBase):
+    def add(self, user: UserCreate):
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -15,13 +15,13 @@ class AbstractRepository(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def update(self, user: UserBase, key: str, value: Union[str, int]):
+    def update(self, user: UserDTO, key: str, value: Union[str, int]):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get(self, uuid: str) -> Type[UserBase]:
+    def get(self, uuid: str) -> UserDTO:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def list(self, limit: Optional[int], start: Optional[int]) -> List[UserBase]:
+    def list(self, limit: Optional[int], start: Optional[int]) -> List[UserDTO]:
         raise NotImplementedError

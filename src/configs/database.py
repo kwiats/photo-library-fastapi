@@ -1,3 +1,6 @@
+from datetime import datetime
+from uuid import uuid4
+
 from sqlalchemy import create_engine, MetaData, Table, Column, Uuid, String, Boolean, DateTime
 from sqlalchemy.orm import DeclarativeBase, sessionmaker, scoped_session
 
@@ -15,12 +18,12 @@ SessionLocal = sessionmaker(
 
 user_table = Table('user',
                    metadata_obj,
-                   Column('uuid', Uuid, primary_key=True),
-                   Column('username', String(30), nullable=False),
+                   Column('uuid', Uuid, primary_key=True, default=uuid4),
+                   Column('username', String(30), nullable=False, unique=True),
                    Column('password', String, nullable=False),
                    Column('email', String),
                    Column('is_active', Boolean, default=False),
-                   Column('created_date', DateTime),
+                   Column('created_date', DateTime, default=datetime.now),
                    )
 
 
@@ -32,8 +35,9 @@ def init():
     metadata_obj.create_all(engine)
     Base.metadata.create_all(engine)
 
+
 def get_db_connection():
-    db = scoped_session(SessionLocal)
+    db = SessionLocal()
     try:
         yield db
     finally:

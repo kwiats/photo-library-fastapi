@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from src.configs.database import get_db_connection
 from src.models.auth.models import User
 from src.repositories.auth.repository_base import AbstractRepository
-from src.schemas.pydantic.auth_schema import UserBase
+from src.schemas.pydantic.auth_schema import UserCreate, UserDTO
 
 
 class AuthRepository(AbstractRepository):
@@ -20,33 +20,31 @@ class AuthRepository(AbstractRepository):
             with self._session.begin():
                 self._session.delete(user_obj)
 
-    def update(self, user: UserBase, key: str, value: Union[str, int]) -> User:
+    def update(self, user: UserDTO, key: str, value: Union[str, int]) -> User:
         user_obj = self._session.query(User).filter_by(uuid=user.uuid).first()
-        if user_obj:
-            with self._session.begin():
-                setattr(user_obj, key, value)
+        if not user_obj:
+            raise ValueError(f'User about index {user.uuid} doesnt exists')
+        with self._session.begin():
+            setattr(user_obj, key, value)
             self._session.refresh(user_obj)
-            return user_obj
-        else:
-            return None
+        return user_obj
 
     def get(self, uuid: str) -> User:
-        return self._session\
+        user = self._session\
             .query(User)\
             .filter_by(uuid=uuid)\
             .first()
 
+        return user
+
     def list(self, start: int,
              limit: int) -> List[User]:
-        return self._session\
-            .query(User)\
-            .offset(start)\
-            .limit(limit)\
-            .all()
+        users = self._session.query(User).offset(start).limit(limit).all()
+        return users
 
-    def add(self, user: UserBase):
+    def add(self, user: UserCreate) -> User:
         created_user = User(**user.model_dump())
-        with self._session.begin():
-            self._session.add(created_user)
-            self._session.refresh(created_user)
+        self._session.add(created_user)
+        self._session.commit()
+        self._session.refresh(created_user)
         return created_user

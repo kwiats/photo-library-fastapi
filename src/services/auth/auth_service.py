@@ -1,7 +1,6 @@
 from typing import List
 from uuid import UUID
 
-from src.models.auth.models import User
 from src.repositories.auth.auth_repository import AuthRepository
 from src.schemas.pydantic.auth_schema import UserBase, UserDTO
 

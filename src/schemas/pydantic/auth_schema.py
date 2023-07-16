@@ -5,15 +5,16 @@ from pydantic import BaseModel
 
 
 class UserBase(BaseModel):
-    uuid: UUID
+    pass
+
+
+class UserCreate(UserBase):
     username: str
     password: str
     email: str
-    is_active: bool
-    created_date: datetime
 
 
-class UserDTO(BaseModel):
+class UserDTO(UserBase):
     uuid: UUID
     username: str
     email: str
